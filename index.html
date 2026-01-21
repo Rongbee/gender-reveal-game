@@ -88,11 +88,51 @@
   }
     const scenes = {
       start: {
-        text: "某個溫暖的午後，你收到了來自準爸媽的一封邀請。\n\n『在揭曉之前，我們想請你陪我們走一小段故事。』",
+        text: "歡迎來到恩恩寶寶的奇幻世界。\n\n想知道我的性別嗎？\n那就先陪我走一段故事吧。",
         choices: [
-          { text: "開始故事", next: "q1" }
+          { text: "進入故事", next: "take1" }
         ]
       },
+      take1: {
+        text: "在這個寒冷的日子裡，你提著裝著火柴的小木籃，\n踩著小小的步伐，面對呼嘯而來的風雪。\n\n你扯著喉嚨喊道：",
+        choices: [
+          { text: "有沒有人要買火柴？", next: "a1_1", value: "sell_match" },
+          { text: "有沒有人要買女孩？", next: "a1_2", value: "sell_girl" },
+          { text: "不喊了，點亮籃子裡的火柴", next: "a1_3", value: "light_match" }
+        ]
+      },
+      a1_1: {
+  text: "來來去去的人們對你不屑一顧。\n冷到不行的你只好點燃火柴。\n\n哇～是大餐！\n哇～是禮物！\n哇～是阿罵ㄟ！\n\n阿罵：跟我到天國去吧。",
+  choices: [
+    { text: "……", next: "rip" }
+  ]
+},
+a1_2: {
+  text: "歐伊歐伊，警車來了。\n\n警察：你涉嫌買賣幼童，依照火柴法將你上銬入監服刑。\n\n在陰冷的監獄裡，你冷到不行，只好點燃火柴……\n\n阿罵：跟我到天國去吧。",
+  choices: [
+    { text: "……", next: "rip" }
+  ]
+},
+a1_3: {
+  text: "你靠在樹旁，點了一根火柴。\n\n哇！是……大！\n一陣大風颳來，火柴滅了。\n\n你又點了一根火柴。\n哇！嘩啦——\n樹上的雪蓋了你一身。\n\n最後一根火柴。\n哇～是阿罵ㄟ。\n\n阿罵：跟我到天國去吧。",
+  choices: [
+    { text: "……", next: "rip" }
+  ]
+},
+rip: {
+  text: "畫面一黑。\n\nR.I.P.\n\n請問你要復活再來，還是上天堂呢？",
+  choices: [
+    { text: "復活再來", next: "take1", value: "revive" },
+    { text: "上天堂", next: "take3", value: "heaven" }
+  ]
+},
+      take3: {
+  text: "畫面來到天堂。\n\n雲朵柔軟，光線溫暖。\n\n歡迎你來到天堂。",
+  choices: [
+    { text: "繼續", next: "q1" }
+  ]
+},
+
       q1: {
         text: "第一個傳說出現了。\n\n大家總說，肚子的形狀，似乎藏著一點秘密⋯⋯",
         choices: [
@@ -163,4 +203,5 @@
   </script>
 </body>
 </html>
+
 
