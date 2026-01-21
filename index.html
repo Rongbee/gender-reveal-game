@@ -55,6 +55,37 @@
 
   <script>
     // ====== 1. 遊戲資料（之後只要改這裡就好） ======
+    //11501211140新增
+    // 最一開始顯示輸入 ID 畫面
+  function renderIDInput() {
+    const textDiv = document.getElementById("scene-text");
+    const choicesDiv = document.getElementById("choices");
+
+    textDiv.innerText = "請輸入你的玩家 ID：";
+    choicesDiv.innerHTML = "";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "玩家 ID";
+    input.style.padding = "8px";
+    input.style.fontSize = "1rem";
+    input.style.width = "70%";
+
+    const btn = document.createElement("button");
+    btn.innerText = "開始遊戲";
+    btn.onclick = () => {
+      if (input.value.trim() !== "") {
+        playerID = input.value.trim();
+        console.log("玩家 ID:", playerID); // 可存資料庫
+        renderScene(currentScene); // 開始遊戲
+      } else {
+        alert("請輸入玩家 ID！");
+      }
+    };
+
+    choicesDiv.appendChild(input);
+    choicesDiv.appendChild(btn);
+  }
     const scenes = {
       start: {
         text: "某個溫暖的午後，你收到了來自準爸媽的一封邀請。\n\n『在揭曉之前，我們想請你陪我們走一小段故事。』",
@@ -113,6 +144,7 @@
     // ====== 4. 處理選擇（之後可接資料庫） ======
     function handleChoice(sceneKey, choice) {
       playLog.push({
+        playerID: playerID,  // 記錄玩家ID，新增01211138
         scene: sceneKey,
         choice: choice.value || choice.text,
         time: new Date().toISOString()
@@ -126,7 +158,9 @@
     }
 
     // ====== 5. 啟動遊戲 ======
-    renderScene(currentScene);
+    //renderScene(currentScene);
+    renderIDInput();
   </script>
 </body>
 </html>
+
