@@ -62,17 +62,29 @@
 			  width: 100vw;
 			  height: 100vh;
 
-			  display: none;              /* 預設不顯示 */
+			  display: flex;              /* 預設畫面置中*/
 			  justify-content: center;    /* 水平置中 */
 			  align-items: center;        /* 垂直置中 */
 
 			  background: rgba(0, 0, 0, 0.9);
 			  z-index: 9999;
+			  
+			  visibility: hidden;
+			  opacity: 0;
+			  transition: opacity 0.3s ease;
+			}
+			
+			#video-overlay.show {
+			  visibility: visible;
+			  opacity: 1;
 			}
 
 			#story-video {
+			  width: 100%;
+			  height: auto;
 			  max-width: 90vw;
 			  max-height: 90vh;
+			  object-fit: contain;
 			}
 			
 			
@@ -132,7 +144,7 @@
 		<div id="choices-area" class="choices-area"></div>
 
 		<div id="video-overlay" >
-		  <video id="story-video">
+		  <video id="story-video" playsinline webkit-playsinline controls >
 			<source src="" type="video/mp4">
 		</video>
 		</div>
@@ -157,7 +169,7 @@
 
 		const bgm = document.getElementById("bgm");
 		let currentBGM = null;
-
+		let userInteracted = false;
 
 		
 		// ==================== Google Form 單題送出 ====================
@@ -204,6 +216,7 @@
 			  alert("請輸入玩家 ID！");
 			  return;
 			}
+			userInteracted = true;   // ⭐⭐⭐ 關鍵，監控玩家在線上
 			playerName = input.value.trim();
 			
 			// ⭐ 使用者點擊 → 播放音樂（合法）
@@ -216,6 +229,10 @@
 		}
 		
 		function playBGM(key, volume = 0.4) {
+		  if (!userInteracted) return;  //玩家離開時停止
+
+			  stopBGM();
+					
 		  if (currentBGM === key) return; // 同一首就不重播
 
 		  currentBGM = key;
@@ -228,8 +245,14 @@
 		  bgm.pause();
 		}
 
+		function resumeBGM() {  //玩家回來時重播
+		  if (!userInteracted) return;
+		  if (currentBGM && currentBGM.paused) {
+			currentBGM.play().catch(() => {});
+		  }
+		}
 		
-		function playSound(src) {
+		function playSound(src) {  //音效備用插槽，現在沒有功能
 		  const sfx = new Audio(src);
 		  sfx.volume = 0.8;
 		  sfx.play();
@@ -432,32 +455,43 @@
 		  document.getElementById("story-section").style.display = "none";
 
 		  // 顯示影片
-		  videoOverlay.style.display = "block";
 		  video.src = src;
 		  video.currentTime = 0;
+		  
+		  videoOverlay.classList.add("show");
 		  video.play();
 		  
 		  //跳過影片
-		  videoOverlay.onclick = () => {
-			video.pause();
-			videoOverlay.style.display = "none";
-			videoOverlay.onclick = null;
-			document.getElementById("story-section").style.display = "flex"; //前面做了隱藏文字，所以結束前要把它加回來
-			currentStep++;      // ✅ 只在這裡加
-			nextStep();
-			bgm.play();
-		  };
+		  videoOverlay.onclick = endVideo;
+		  video.onended = endVideo;
+		  }
+		
+		function endVideo() {
+		  const videoOverlay = document.getElementById("video-overlay");
+		  const video = document.getElementById("story-video");
 
-		  // 播完自動下一句
-		  video.onended = () => {
-			videoOverlay.style.display = "none";
-			document.getElementById("story-section").style.display = "flex"; //前面做了隱藏文字，所以結束前要把它加回來
-			currentStep++;      // ✅ 只在這裡加
-			nextStep(); // 你的「下一段劇情」函式
-			bgm.play();
-		  };
+		  // ✅ 停影片（最重要）
+		  video.pause();
+		  video.currentTime = 0;
+		  video.removeAttribute("src");
+		  video.load();
+
+		  // 關畫面
+		  videoOverlay.classList.remove("show");
+		  videoOverlay.onclick = null;
+
+		  // 回到文字
+		  document.getElementById("story-section").style.display = "flex";
+
+		  // 回到劇情
+		  currentStep++;
+		  nextStep();
+
+		  // 音樂接回來
+		  bgm.play();
 		}
 
+		
 
 		// 測驗邏輯
 		function startQuiz() {
@@ -555,8 +589,47 @@
 			
 			document.getElementById('character-name').innerText = finalTitle;
 			document.getElementById('dialogue-text').innerText = finalMessage;
-	}
 			
+			// ⭐ 5 秒後自動結束
+			  const endTimer = setTimeout(endGame, 10000);
+
+			  // ⭐ 點擊任意處立刻結束
+			  document.getElementById("dialogue-box").onclick = () => {
+				clearTimeout(endTimer); // 清掉計時器
+				endGame();
+			};
+		}
+		function endGame() {
+		  // 1️⃣ 停止流程
+		  isHeavenMode = false;
+
+		  // 2️⃣ 停止音樂
+		  stopBGM();
+
+		  // 3️⃣ 清空選項
+		  document.getElementById("choices-area").innerHTML = "";
+
+		  // 4️⃣ 顯示結束文字
+		  document.getElementById("character-name").innerText = "旁白";
+		  document.getElementById("dialogue-text").innerText =
+			`🎉 遊戲結束 🎉\n\n` +
+			`玩家：${playerName}\n` +
+			`感謝參與這場生命旅程！`;
+
+		  // 5️⃣（可選）鎖住點擊
+		  document.getElementById("dialogue-box").onclick = null;
+		}
+		
+		document.addEventListener("visibilitychange", () => {
+		  if (document.hidden) {
+			stopBGM();
+		  } else {
+			resumeBGM();
+		  }
+		});
+
+		window.addEventListener("pagehide", stopBGM);
+	
 	</script>
 
 	</body>
