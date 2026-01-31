@@ -55,10 +55,26 @@
 			.mode-heaven .choice-btn:hover { background: #d35400; }
 
 			/* --- 影片層 --- */
-			#video-overlay { 
-				display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-				background: black; z-index: 100; justify-content: center; align-items: center; 
+			#video-overlay {
+			  position: fixed;
+			  top: 0;
+			  left: 0;
+			  width: 100vw;
+			  height: 100vh;
+
+			  display: none;              /* 預設不顯示 */
+			  justify-content: center;    /* 水平置中 */
+			  align-items: center;        /* 垂直置中 */
+
+			  background: rgba(0, 0, 0, 0.9);
+			  z-index: 9999;
 			}
+
+			#story-video {
+			  max-width: 90vw;
+			  max-height: 90vh;
+			}
+			
 			
 			/* --- 黑幕轉場模式 --- */
 			body.mode-black {
@@ -100,6 +116,7 @@
 			}
 
 		</style>
+		
 	</head>
 	<body class="mode-adventure">
 
@@ -114,25 +131,33 @@
 
 		<div id="choices-area" class="choices-area"></div>
 
-		<div id="video-overlay" style="
-			display:none;
-			position:fixed;
-			inset:0;
-			background:black;
-			z-index:9999;
-			justify-content:center;
-			align-items:center;
-		">
-		  <video id="story-video" style="max-width:100%; max-height:100%;">
+		<div id="video-overlay" >
+		  <video id="story-video">
 			<source src="" type="video/mp4">
 		</video>
 		</div>
-
+	
 	</div>
-
+	
+	<!-- ✅ 音樂元件放這裡 -->
+	<audio id="bgm" src="audios/bgm.mp3" loop></audio>
+  
 	<script>
 	// ==================== 基本狀態 ====================
 		let playerName = "";
+		
+		//定義背景音樂
+		const BGM_LIST = {
+		  cute: "audios/cute.mp3",
+		  god: "audios/god.mp3",
+		  guess: "audios/guess.mp3",
+		  blackbgm: "audios/blackbgm.mp3",
+		  god2: "audios/god2.mp3"
+		};
+
+		const bgm = document.getElementById("bgm");
+		let currentBGM = null;
+
 
 		
 		// ==================== Google Form 單題送出 ====================
@@ -154,8 +179,9 @@
 			}
 
 		// ====== 1. 遊戲資料（之後只要改這裡就好） ======
+		
 		// 最一開始顯示輸入 ID 畫面
-	  function renderIDInput() {
+		function renderIDInput() {
 		document.getElementById('character-name').innerText = "旁白";
 		document.getElementById('dialogue-text').innerText = "請輸入你的玩家 ID";
 		
@@ -179,11 +205,34 @@
 			  return;
 			}
 			playerName = input.value.trim();
+			
+			// ⭐ 使用者點擊 → 播放音樂（合法）
+			playBGM("cute", 0.4);
 			showScene("start");
-		  };
+			};
 
 		  area.appendChild(input);
 		  area.appendChild(btn);
+		}
+		
+		function playBGM(key, volume = 0.4) {
+		  if (currentBGM === key) return; // 同一首就不重播
+
+		  currentBGM = key;
+		  bgm.src = BGM_LIST[key];
+		  bgm.volume = volume;
+		  bgm.play();
+		}
+
+		function stopBGM() {
+		  bgm.pause();
+		}
+
+		
+		function playSound(src) {
+		  const sfx = new Audio(src);
+		  sfx.volume = 0.8;
+		  sfx.play();
 		}
 		// 1. 分支劇情資料
 		const scenes = {
@@ -342,6 +391,7 @@
 			if (data.action === "quiz") {
 			currentStep++;
 			startQuiz();   // ⭐ 啟動問答
+			playBGM("guess",0.4);
 			return;
 			}
 		}
@@ -349,8 +399,11 @@
 		// ⭐ 黑幕轉場判斷
 		if (data.black) {
 			document.body.className = "mode-black";
-		} else {
+			playBGM("blackbgm",0.4);
+		} 
+		else {
 			document.body.className = "mode-heaven";
+			playBGM("god2",0.4);
 		}
 
 		// 顯示內容
@@ -373,6 +426,9 @@
 		function playVideo(src) {  //影片播放邏輯
 		  const videoOverlay = document.getElementById("video-overlay");
 		  const video = document.getElementById("story-video");
+		  if (!bgm.paused) {  // 暫停音樂而不是 stop
+			bgm.pause();
+		}
 
 		  // 隱藏文字區
 		  document.getElementById("story-section").style.display = "none";
@@ -391,6 +447,7 @@
 			document.getElementById("story-section").style.display = "flex"; //前面做了隱藏文字，所以結束前要把它加回來
 			currentStep++;      // ✅ 只在這裡加
 			nextStep();
+			bgm.play();
 		  };
 
 		  // 播完自動下一句
@@ -399,6 +456,7 @@
 			document.getElementById("story-section").style.display = "flex"; //前面做了隱藏文字，所以結束前要把它加回來
 			currentStep++;      // ✅ 只在這裡加
 			nextStep(); // 你的「下一段劇情」函式
+			bgm.play();
 		  };
 		}
 
@@ -505,4 +563,3 @@
 
 	</body>
 	</html>
-
