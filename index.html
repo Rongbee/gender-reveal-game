@@ -62,29 +62,17 @@
 			  width: 100vw;
 			  height: 100vh;
 
-			  display: flex;              /* 預設畫面置中*/
+			  display: none;              /* 預設不顯示 */
 			  justify-content: center;    /* 水平置中 */
 			  align-items: center;        /* 垂直置中 */
 
 			  background: rgba(0, 0, 0, 0.9);
 			  z-index: 9999;
-			  
-			  visibility: hidden;
-			  opacity: 0;
-			  transition: opacity 0.3s ease;
-			}
-			
-			#video-overlay.show {
-			  visibility: visible;
-			  opacity: 1;
 			}
 
 			#story-video {
-			  width: 100%;
-			  height: auto;
 			  max-width: 90vw;
 			  max-height: 90vh;
-			  object-fit: contain;
 			}
 			
 			
@@ -144,7 +132,7 @@
 		<div id="choices-area" class="choices-area"></div>
 
 		<div id="video-overlay" >
-		  <video id="story-video" playsinline webkit-playsinline controls >
+		  <video id="story-video">
 			<source src="" type="video/mp4">
 		</video>
 		</div>
@@ -444,43 +432,32 @@
 		  document.getElementById("story-section").style.display = "none";
 
 		  // 顯示影片
+		  videoOverlay.style.display = "block";
 		  video.src = src;
 		  video.currentTime = 0;
-		  
-		  videoOverlay.classList.add("show");
 		  video.play();
 		  
 		  //跳過影片
-		  videoOverlay.onclick = endVideo;
-		  video.onended = endVideo;
-		  }
-		
-		function endVideo() {
-		  const videoOverlay = document.getElementById("video-overlay");
-		  const video = document.getElementById("story-video");
+		  videoOverlay.onclick = () => {
+			video.pause();
+			videoOverlay.style.display = "none";
+			videoOverlay.onclick = null;
+			document.getElementById("story-section").style.display = "flex"; //前面做了隱藏文字，所以結束前要把它加回來
+			currentStep++;      // ✅ 只在這裡加
+			nextStep();
+			bgm.play();
+		  };
 
-		  // ✅ 停影片（最重要）
-		  video.pause();
-		  video.currentTime = 0;
-		  video.removeAttribute("src");
-		  video.load();
-
-		  // 關畫面
-		  videoOverlay.classList.remove("show");
-		  videoOverlay.onclick = null;
-
-		  // 回到文字
-		  document.getElementById("story-section").style.display = "flex";
-
-		  // 回到劇情
-		  currentStep++;
-		  nextStep();
-
-		  // 音樂接回來
-		  bgm.play();
+		  // 播完自動下一句
+		  video.onended = () => {
+			videoOverlay.style.display = "none";
+			document.getElementById("story-section").style.display = "flex"; //前面做了隱藏文字，所以結束前要把它加回來
+			currentStep++;      // ✅ 只在這裡加
+			nextStep(); // 你的「下一段劇情」函式
+			bgm.play();
+		  };
 		}
 
-		
 
 		// 測驗邏輯
 		function startQuiz() {
