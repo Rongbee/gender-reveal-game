@@ -1,457 +1,507 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>恩恩寶寶的奇幻世界 - 性別派對</title>
-    <style>
-        /* --- 基礎共用設定 --- */
-        body { 
-            margin: 0; display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; font-family: 'Microsoft JhengHei', sans-serif;
-            transition: background 0.8s ease;
-        }
-        #game-container { transition: all 0.8s ease; position: relative; overflow: hidden; }
-        
-        /* --- 模式一：分支劇情 (Adventure) --- */
-        body.mode-adventure { background: linear-gradient(135deg, #fdeff9, #ecf9ff); color: #333; }
-        .mode-adventure #game-container { 
-            background: #fff; max-width: 420px; width: 90%; padding: 30px; 
-            border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-        }
-        .mode-adventure #portrait { display: none; }
-        .mode-adventure #character-name { color: #ff6b6b; font-size: 1.4em; margin-bottom: 15px; }
-        .mode-adventure #dialogue-text { font-size: 1.1rem; line-height: 1.6; white-space: pre-wrap; }
+	<!DOCTYPE html>
+	<html lang="zh-TW">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>恩恩寶寶的奇幻世界 - 性別派對</title>
+		<style>
+			/* --- 基礎共用設定 --- */
+			body { 
+				margin: 0; display: flex; justify-content: center; align-items: center; 
+				min-height: 100vh; font-family: 'Microsoft JhengHei', sans-serif;
+				transition: background 0.8s ease;
+			}
+			#game-container { transition: all 0.8s ease; position: relative; overflow: hidden; }
+			
+			/* --- 模式一：分支劇情 (Adventure) --- */
+			body.mode-adventure { background: linear-gradient(135deg, #fdeff9, #ecf9ff); color: #333; }
+			.mode-adventure #game-container { 
+				background: #fff; max-width: 420px; width: 90%; padding: 30px; 
+				border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+			}
+			.mode-adventure #portrait { display: none; }
+			.mode-adventure #character-name { color: #ff6b6b; font-size: 1.4em; margin-bottom: 15px; }
+			.mode-adventure #dialogue-text { font-size: 1.1rem; line-height: 1.6; white-space: pre-wrap; }
 
-        /* --- 模式二：天庭對話 (Heaven) --- */
-        body.mode-heaven { background: #2c3e50; color: white; }
-        .mode-heaven #game-container { 
-            width: 95%; max-width: 800px; height: 550px; background: #34495e; 
-            border: 4px solid #ecf0f1; border-radius: 15px; padding: 25px; box-sizing: border-box;
-            display: flex; flex-direction: column; justify-content: flex-end;
-        }
-        .mode-heaven #story-section { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; }
-        .mode-heaven #portrait { 
-            width: 120px; height: 120px; background: #95a5a6; border-radius: 10px; 
-            margin-bottom: 10px; border: 3px solid gold; display: flex; 
-            align-items: center; justify-content: center; font-size: 60px; 
-        }
-        .mode-heaven #dialogue-box { 
-            background: rgba(0,0,0,0.85); border: 2px solid #bdc3c7; 
-            padding: 20px; border-radius: 10px; cursor: pointer; min-height: 120px;
-        }
-        .mode-heaven #character-name { font-size: 1.3em; margin-bottom: 8px; }
-        .mode-heaven #dialogue-text { font-size: 1.2rem; line-height: 1.5; }
+			/* --- 模式二：天庭對話 (Heaven) --- */
+			body.mode-heaven { background: #2c3e50; color: white; }
+			.mode-heaven #game-container { 
+				width: 95%; max-width: 800px; height: 550px; background: #34495e; 
+				border: 4px solid #ecf0f1; border-radius: 15px; padding: 25px; box-sizing: border-box;
+				display: flex; flex-direction: column; justify-content: flex-end;
+			}
+			.mode-heaven #story-section { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+			.mode-heaven #portrait { 
+				width: 120px; height: 120px; background: #95a5a6; border-radius: 10px; 
+				margin-bottom: 10px; border: 3px solid gold; display: flex; 
+				align-items: center; justify-content: center; font-size: 60px; 
+			}
+			.mode-heaven #dialogue-box { 
+				background: rgba(0,0,0,0.85); border: 2px solid #bdc3c7; 
+				padding: 20px; border-radius: 10px; cursor: pointer; min-height: 120px;
+			}
+			.mode-heaven #character-name { font-size: 1.3em; margin-bottom: 8px; }
+			.mode-heaven #dialogue-text { font-size: 1.2rem; line-height: 1.5; }
 
-        /* --- 按鈕樣式 --- */
-        .choices-area { margin-top: 20px; width: 100%; }
-        .choice-btn {
-            display: block; width: 100%; padding: 12px; margin: 10px 0;
-            font-size: 1rem; border-radius: 10px; border: none; cursor: pointer;
-            background: #f0f4ff; transition: all 0.2s;
-        }
-        .choice-btn:hover { background: #e0e8ff; transform: translateY(-2px); }
-        .mode-heaven .choice-btn { background: #e67e22; color: white; border: 1px solid #d35400; }
-        .mode-heaven .choice-btn:hover { background: #d35400; }
+			/* --- 按鈕樣式 --- */
+			.choices-area { margin-top: 20px; width: 100%; }
+			.choice-btn {
+				display: block; width: 100%; padding: 12px; margin: 10px 0;
+				font-size: 1rem; border-radius: 10px; border: none; cursor: pointer;
+				background: #f0f4ff; transition: all 0.2s;
+			}
+			.choice-btn:hover { background: #e0e8ff; transform: translateY(-2px); }
+			.mode-heaven .choice-btn { background: #e67e22; color: white; border: 1px solid #d35400; }
+			.mode-heaven .choice-btn:hover { background: #d35400; }
 
-        /* --- 影片層 --- */
-        #video-overlay { 
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: black; z-index: 100; justify-content: center; align-items: center; 
-        }
+			/* --- 影片層 --- */
+			#video-overlay { 
+				display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+				background: black; z-index: 100; justify-content: center; align-items: center; 
+			}
+			
+			/* --- 黑幕轉場模式 --- */
+			body.mode-black {
+				background: black;
+				color: white;
+			}
+
+			.mode-black #game-container {
+				background: transparent;
+				box-shadow: none;
+			}
+
+			.mode-black #story-section {
+				height: 100vh;
+				display: flex;
+				justify-content: center;   /* 垂直置中 */
+				align-items: center;       /* 水平置中 */
+			}
+
+			.mode-black #dialogue-box {
+				background: transparent;
+				border: none;
+				cursor: pointer;
+				min-height: auto;
+				max-width: 800px;
+			}	
+
+			.mode-black #character-name,
+			.mode-black #portrait,
+			.mode-black #choices-area {
+				display: none;
+			}
+
+			.mode-black #dialogue-text {
+				font-size: 1.6rem;
+				line-height: 1.8;
+				text-align: center;
+				white-space: pre-wrap;
+			}
+
+		</style>
+	</head>
+	<body class="mode-adventure">
+
+	<div id="game-container">
+		<div id="story-section">
+			<div id="portrait">👧</div>
+			<div id="dialogue-box">
+				<div id="character-name">旁白</div>
+				<div id="dialogue-text">請輸入玩家 ID</div>
+			</div>
+		</div>
+
+		<div id="choices-area" class="choices-area"></div>
+
+		<div id="video-overlay" style="
+			display:none;
+			position:fixed;
+			inset:0;
+			background:black;
+			z-index:9999;
+			justify-content:center;
+			align-items:center;
+		">
+		  <video id="story-video" style="max-width:100%; max-height:100%;">
+			<source src="" type="video/mp4">
+		</video>
+		</div>
+
+	</div>
+
+	<script>
+	// ==================== 基本狀態 ====================
+		let playerName = "";
+
 		
-		/* --- 黑幕轉場模式 --- */
-		body.mode-black {
-			background: black;
-			color: white;
+		// ==================== Google Form 單題送出 ====================
+		function submitQuestionResult(qNum, playerChoice, correctAnswer) {
+		  const isCorrect = playerChoice === correctAnswer ? 1 : 0;
+
+			  fetch("https://docs.google.com/forms/u/0/d/e/1FAIpQLSd-Bixh-2t6YxcDft7waVWTjRQcxe8ELjDjKs_cou9Any7pVQ/formResponse", {
+				method: "POST",
+				mode: "no-cors",
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: new URLSearchParams({
+				  "entry.459675020": playerName,
+				  "entry.567840841": qNum,
+				  "entry.1209246976": playerChoice,
+				  "entry.451095050": correctAnswer,
+				  "entry.447682042": isCorrect
+				})
+			  });
+			}
+
+		// ====== 1. 遊戲資料（之後只要改這裡就好） ======
+		// 最一開始顯示輸入 ID 畫面
+	  function renderIDInput() {
+		document.getElementById('character-name').innerText = "旁白";
+		document.getElementById('dialogue-text').innerText = "請輸入你的玩家 ID";
+		
+		  const area = document.getElementById('choices-area');
+		  area.innerHTML = "";
+		  
+		  const input = document.createElement("input");
+		  input.type = "text";
+		  input.placeholder = "玩家 ID";
+		  input.style.padding = "10px";
+		  input.style.width = "100%";
+		  input.style.fontSize = "1rem";
+
+		  const btn = document.createElement("button");
+		  btn.className = "choice-btn";
+		  btn.innerText = "開始遊戲";
+
+		  btn.onclick = () => {
+			if (!input.value.trim()) {
+			  alert("請輸入玩家 ID！");
+			  return;
+			}
+			playerName = input.value.trim();
+			showScene("start");
+		  };
+
+		  area.appendChild(input);
+		  area.appendChild(btn);
+		}
+		// 1. 分支劇情資料
+		const scenes = {
+			start: {
+				name: "引導",
+				text: "歡迎來到恩恩寶寶的奇幻世界。\n\n想知道我的性別嗎？\n那就先陪我走一段故事吧。",
+				choices: [{ text: "進入故事", next: "take1" }]
+			},
+			take1: {
+				name: "小女孩",
+				text: "在這個寒冷的日子裡，你提著裝著火柴的小木籃，面對呼嘯而來的風雪。你扯著喉嚨喊道：",
+				choices: [
+					{ text: "有沒有人要買火柴？", next: "a1_1" },
+					{ text: "有沒有人要買女孩？", next: "a1_2" },
+					{ text: "不喊了，點亮籃子裡的火柴", next: "a1_3" }
+				]
+			},
+			a1_1: {
+				name: "小女孩",
+				text: "來來去去的人們對你不屑一顧。\n冷到不行的你只好點燃火柴。\n\n哇～是大餐！哇～是禮物！\n哇～是阿罵ㄟ！\n\n阿罵：跟我到天國去吧。",
+				choices: [{ text: "……", next: "rip" }]
+			},
+			a1_2: {
+				name: "警察",
+				text: "歐伊歐伊，警車來了。\n警察：你涉嫌買賣幼童，依照火柴法將你上銬。在監獄裡，你冷到不行，點燃火柴……\n\n阿罵：跟我到天國去吧。",
+				choices: [{ text: "……", next: "rip" }]
+			},
+			a1_3: {
+				name: "小女孩",
+				text: "你靠在樹旁點燃火柴。\n哇！是一陣大風颳來，火滅了。\n又點一根，樹上的雪蓋了你一身。\n最後一根火柴...哇～是阿罵ㄟ。\n\n阿罵：跟我到天國去吧。",
+				choices: [{ text: "……", next: "rip" }]
+			},
+			rip: {
+				name: "終局",
+				text: "畫面一黑。\n\nR.I.P.\n\n請問你要復活再來，還是上天堂呢？",
+				choices: [
+					{ text: "復活再來", next: "take1" },
+					{ text: "上天堂", next: "HEAVEN_EVENT" }
+				]
+			}
+		};
+
+		// 2. 天庭線性對話資料
+		const roles = {
+			"小女孩": { color: "#ff9ff3", img: "👧" },
+			"阿罵": { color: "#54a0ff", img: "👵" },
+			"北斗星君": { color: "#ee5253", img: "👺" },
+			"南斗星君": { color: "#10ac84", img: "👴" },
+			"註生娘娘": { color: "#feca57", img: "👸" },
+			"財神爺": { color: "#ff9f43", img: "💰" },
+			"我": { color: "#00d2d3", img: "👤" },
+			"旁白": { color: "#ffffff", img: "📜" }
+		};
+		
+
+		const scripts = [
+			{ 
+			role: "旁白", 
+			text: "傳說每個人投胎前都是花叢裡的花，由花公花婆細心照料著...。\n而白花是男孩，紅花則是女孩。",
+			black: true
+			},
+			{ 
+			role: "旁白", 
+			text: "歡迎您來到天堂。",
+			black: true
+			},
+			{ role: "旁白", text: "你的面前雲霧繚繞，出現了兩位神秘老者，一位是南斗星君，一位是北斗星君" },
+			{ role: "旁白", text: "傳說...南斗星君，掌管生命、壽命與爵祿。他是象徵「生機」的神，靈魂要降臨人間時，是由南斗星君賦予生命力。\n而北斗星君，掌管死亡與審判，決定一個人的生命何時結束。" },
+			{ role: "北斗星君", text: "唉呦威壓！你不在我的名單裡，你怎麼在這？！" },
+			{ role: "我", text: "我....我是被阿罵帶來的..." },
+			{ role: "北斗星君", text: "（扶額）牛頭馬面，你們牛馬組不是缺人嗎？這傢伙看起來挺社畜的。" },
+			{ role: "ACTION", action: "video" , type: "video",src: "videos\9527.mp4" },   // ⭐ 插在這(9527影片)
+			{ role: "我", text: "等一等!!!"},
+			{ role: "我", text: "稟大人，小人本住在蘇州的城邊， 家中有屋又有田，生活樂無邊。"},
+			{ role: "我", text: "誰知那唐伯虎，他蠻橫不留情，勾結官俯目無天，占我大屋奪我田，我爺爺跟他來翻臉，慘被他一棍來打扁，...  "},
+			{ role: "我", text: "最終流落到江邊。為求養老爹，只有獨賣火柴在廟前。... 誰知那唐伯虎，他實在太陰險 知道此情形，竟派人來暗算"},
+			{ role: "我", text: "把我父子狂毆在市前，小人身壯健，殘命得留存。為求葬老爹，唯有賣身為奴自作賤， 一面勤賺錢，一面讀書篇， 發誓把功名顯，手刃仇人意志堅! 從此唐寅詩集伴身邊，我銘記此仇不共戴天!!!" },
+			{ role: "ACTION", action: "video", type: "video",src: "videos\madam4.mp4"  }, 
+			//{ role: "我", text: "...小人為求葬老爹，唯有賣身為奴自作賤！從此唐寅詩集伴身邊，我銘記此仇不共戴天！！！" },
+			{ role: "北斗星君", text: "然後？" },
+			{ role: "我", text: "然後....就被阿罵帶上來了。" },
+			{ role: "北斗星君", text: "（這人怪怪的...）" },
+			{ role: "南斗星君", text: "這不也挺有趣的嗎？咦?註生娘娘跟財神爺剛好也來啦!不如就給他個重生的好機會吧。" },
+			{ role: "註生娘娘", text: "那麼...反正有財神爺在，安排個普通但有愛的家，至於性別就決定為..." },
+			{ role: "財神爺", text: "且慢!不如這小傢伙猜猜看，註生娘娘為他安排的是男孩還是女孩" },
+			{ role: "旁白", text: "財神爺準備了7道謎題，是男還是女孩全藏在謎底裡面 \n\n事不宜遲，解題開始!!" },
+			{ role: "ACTION", action: "quiz" }
+		];
+
+		// 3. 測驗題目
+		const questions = [
+			{ q: "哆啦A夢是什麼顏色？", a: ["紅色", "藍色"], correct: 0 },
+			{ q: "誰最愛亂買東西？", a: ["獅子", "老虎", "斑馬"], correct: 2 },
+			{ q: "很可愛的螞蟻叫什麼？", a: ["可愛蟻", "史狗蟻", "卡哇蟻"], correct: 2 },
+			{ q: "誰沒生孩子就先當上了娘？", a: ["偽娘", "新娘", "喵娘"], correct: 1 },
+			{ q: "張雨生家裡的木頭都哪裡來的？", a: ["買來的", "鋸來的", "種來的"], correct: 1 },
+			{ q: "這是腳的英文怎麼說？", a: ["foot", "Oliver", "Jessica"], correct: 2 },
+			{ q: "屁股的英文怎麼說？", a: ["bottom", "KK ass", "Jessica Chen"], correct: 2 }
+		];
+
+		// 4. 遊戲控制變數
+		let currentStep = 0;
+		let currentQuiz = 0;
+		let score = 0;
+		let isHeavenMode = false;
+
+		window.onload = () => { renderIDInput(); };
+
+		// 執行分支劇情
+		function showScene(key, skipClear = false) {
+			if (key === "HEAVEN_EVENT") { enterHeaven(); return; }
+
+			const scene = scenes[key];
+			document.getElementById('character-name').innerText = scene.name;
+			document.getElementById('dialogue-text').innerText = scene.text;
+
+			const choicesArea = document.getElementById('choices-area');
+			if (!skipClear) choicesArea.innerHTML = ''; // 只在遊戲正式場景才清空
+
+			if(scene.choices){
+				scene.choices.forEach(c => {
+					const btn = document.createElement('button');
+					btn.className = 'choice-btn';
+					btn.innerText = c.text;
+					btn.onclick = () => showScene(c.next);
+					choicesArea.appendChild(btn);
+				});
+			}
 		}
 
-		.mode-black #game-container {
-			background: transparent;
-			box-shadow: none;
+
+		// 切換到天庭模式
+		function enterHeaven() {
+			isHeavenMode = true;
+			document.body.className = "mode-heaven";
+			document.getElementById('choices-area').innerHTML = '';
+			document.getElementById('dialogue-box').onclick = nextStep;
+			nextStep();
 		}
 
-		.mode-black #story-section {
-			height: 100vh;
-			display: flex;
-			justify-content: center;   /* 垂直置中 */
-			align-items: center;       /* 水平置中 */
+		// 線性對話控制
+		function nextStep() {
+		if (!isHeavenMode || currentStep >= scripts.length) return;
+
+		const data = scripts[currentStep];
+
+		// ACTION 特殊處理
+		if (data.role === "ACTION") {
+			
+			if (data.action === "video") {
+				playVideo(data.src); //呼叫playvideo function
+				return;
+			}	
+
+			
+			if (data.action === "quiz") {
+			currentStep++;
+			startQuiz();   // ⭐ 啟動問答
+			return;
+			}
 		}
 
-		.mode-black #dialogue-box {
-			background: transparent;
-			border: none;
-			cursor: pointer;
-			min-height: auto;
-			max-width: 800px;
-		}	
-
-		.mode-black #character-name,
-		.mode-black #portrait,
-		.mode-black #choices-area {
-			display: none;
+		// ⭐ 黑幕轉場判斷
+		if (data.black) {
+			document.body.className = "mode-black";
+		} else {
+			document.body.className = "mode-heaven";
 		}
 
-		.mode-black #dialogue-text {
-			font-size: 1.6rem;
-			line-height: 1.8;
-			text-align: center;
-			white-space: pre-wrap;
+		// 顯示內容
+		document.getElementById('character-name').innerText = data.role;
+		document.getElementById('character-name').style.color = roles[data.role]?.color || "#fff";
+		document.getElementById('dialogue-text').innerText = data.text;
+		document.getElementById('portrait').innerText = roles[data.role]?.img || "";
+
+		currentStep++;
 		}
 
-    </style>
-</head>
-<body class="mode-adventure">
 
-<div id="game-container">
-    <div id="story-section">
-        <div id="portrait">👧</div>
-        <div id="dialogue-box">
-            <div id="character-name">旁白</div>
-            <div id="dialogue-text">請輸入玩家 ID</div>
-        </div>
-    </div>
-
-    <div id="choices-area" class="choices-area"></div>
-
-    <div id="video-overlay">
-        <div style="text-align: center; color: white;">
-            <h3>【請在此處播放唐伯虎點秋香片段】</h3>
-            <button class="choice-btn" onclick="closeVideo()">看完影片，繼續轉生</button>
-        </div>
-    </div>
-</div>
-
-<script>
-// ==================== 基本狀態 ====================
-	let playerName = "";
-
-	
-	// ==================== Google Form 單題送出 ====================
-	function submitQuestionResult(qNum, playerChoice, correctAnswer) {
-	  const isCorrect = playerChoice === correctAnswer ? 1 : 0;
-
-		  fetch("https://docs.google.com/forms/u/0/d/e/1FAIpQLSd-Bixh-2t6YxcDft7waVWTjRQcxe8ELjDjKs_cou9Any7pVQ/formResponse", {
-			method: "POST",
-			mode: "no-cors",
-			headers: { "Content-Type": "application/x-www-form-urlencoded" },
-			body: new URLSearchParams({
-			  "entry.459675020": playerName,
-			  "entry.567840841": qNum,
-			  "entry.1209246976": playerChoice,
-			  "entry.451095050": correctAnswer,
-			  "entry.447682042": isCorrect
-			})
-		  });
+		function closeVideo() {
+			document.getElementById('video-overlay').style.display = 'none';
+			currentStep++;
+			nextStep();
 		}
 
-	// ====== 1. 遊戲資料（之後只要改這裡就好） ======
-    // 最一開始顯示輸入 ID 畫面
-  function renderIDInput() {
-	document.getElementById('character-name').innerText = "旁白";
-	document.getElementById('dialogue-text').innerText = "請輸入你的玩家 ID";
-	
-	  const area = document.getElementById('choices-area');
-	  area.innerHTML = "";
+		
+		function playVideo(src) {  //影片播放邏輯
+		  const videoOverlay = document.getElementById("video-overlay");
+		  const video = document.getElementById("story-video");
 
-	  const input = document.createElement("input");
-	  input.type = "text";
-	  input.placeholder = "玩家 ID";
-	  input.style.padding = "10px";
-	  input.style.width = "100%";
-	  input.style.fontSize = "1rem";
+		  // 隱藏文字區
+		  document.getElementById("story-section").style.display = "none";
 
-	  const btn = document.createElement("button");
-	  btn.className = "choice-btn";
-	  btn.innerText = "開始遊戲";
+		  // 顯示影片
+		  videoOverlay.style.display = "block";
+		  video.src = src;
+		  video.currentTime = 0;
+		  video.play();
+		  
+		  //跳過影片
+		  videoOverlay.onclick = () => {
+			video.pause();
+			videoOverlay.style.display = "none";
+			videoOverlay.onclick = null;
+			document.getElementById("story-section").style.display = "flex"; //前面做了隱藏文字，所以結束前要把它加回來
+			currentStep++;      // ✅ 只在這裡加
+			nextStep();
+		  };
 
-	  btn.onclick = () => {
-		if (!input.value.trim()) {
-		  alert("請輸入玩家 ID！");
-		  return;
+		  // 播完自動下一句
+		  video.onended = () => {
+			videoOverlay.style.display = "none";
+			document.getElementById("story-section").style.display = "flex"; //前面做了隱藏文字，所以結束前要把它加回來
+			currentStep++;      // ✅ 只在這裡加
+			nextStep(); // 你的「下一段劇情」函式
+		  };
 		}
-		playerName = input.value.trim();
-		showScene("start");
-	  };
 
-	  area.appendChild(input);
-	  area.appendChild(btn);
-	}
-    // 1. 分支劇情資料
-    const scenes = {
-        start: {
-            name: "引導",
-            text: "歡迎來到恩恩寶寶的奇幻世界。\n\n想知道我的性別嗎？\n那就先陪我走一段故事吧。",
-            choices: [{ text: "進入故事", next: "take1" }]
-        },
-        take1: {
-            name: "小女孩",
-            text: "在這個寒冷的日子裡，你提著裝著火柴的小木籃，面對呼嘯而來的風雪。你扯著喉嚨喊道：",
-            choices: [
-                { text: "有沒有人要買火柴？", next: "a1_1" },
-                { text: "有沒有人要買女孩？", next: "a1_2" },
-                { text: "不喊了，點亮籃子裡的火柴", next: "a1_3" }
-            ]
-        },
-        a1_1: {
-            name: "小女孩",
-            text: "來來去去的人們對你不屑一顧。\n冷到不行的你只好點燃火柴。\n\n哇～是大餐！哇～是禮物！\n哇～是阿罵ㄟ！\n\n阿罵：跟我到天國去吧。",
-            choices: [{ text: "……", next: "rip" }]
-        },
-        a1_2: {
-            name: "警察",
-            text: "歐伊歐伊，警車來了。\n警察：你涉嫌買賣幼童，依照火柴法將你上銬。在監獄裡，你冷到不行，點燃火柴……\n\n阿罵：跟我到天國去吧。",
-            choices: [{ text: "……", next: "rip" }]
-        },
-        a1_3: {
-            name: "小女孩",
-            text: "你靠在樹旁點燃火柴。\n哇！是一陣大風颳來，火滅了。\n又點一根，樹上的雪蓋了你一身。\n最後一根火柴...哇～是阿罵ㄟ。\n\n阿罵：跟我到天國去吧。",
-            choices: [{ text: "……", next: "rip" }]
-        },
-        rip: {
-            name: "終局",
-            text: "畫面一黑。\n\nR.I.P.\n\n請問你要復活再來，還是上天堂呢？",
-            choices: [
-                { text: "復活再來", next: "take1" },
-                { text: "上天堂", next: "HEAVEN_EVENT" }
-            ]
-        }
-    };
 
-    // 2. 天庭線性對話資料
-    const roles = {
-        "小女孩": { color: "#ff9ff3", img: "👧" },
-        "阿罵": { color: "#54a0ff", img: "👵" },
-        "北斗星君": { color: "#ee5253", img: "👺" },
-        "南斗星君": { color: "#10ac84", img: "👴" },
-        "註生娘娘": { color: "#feca57", img: "👸" },
-        "財神爺": { color: "#ff9f43", img: "💰" },
-        "我": { color: "#00d2d3", img: "👤" },
-        "旁白": { color: "#ffffff", img: "📜" }
-    };
-	
+		// 測驗邏輯
+		function startQuiz() {
+			document.getElementById('dialogue-box').onclick = null; // 測驗時暫停點擊對話
+			showQuestion();
+		}
 
-    const scripts = [
-		{ 
-        role: "旁白", 
-        text: "傳說每個人投胎前都是花叢裡的花，由花公花婆細心照料著...。\n而白花是男孩，紅花則是女孩。",
-        black: true
-		},
-		{ 
-        role: "旁白", 
-        text: "歡迎您來到天堂。",
-        black: true
-		},
-        { role: "旁白", text: "你的面前雲霧繚繞，出現了兩位神秘老者，一位是南斗星君，一位是北斗星君" },
-		{ role: "旁白", text: "傳說...南斗星君，掌管生命、壽命與爵祿。他是象徵「生機」的神，靈魂要降臨人間時，是由南斗星君賦予生命力。\n而北斗星君，掌管死亡與審判，決定一個人的生命何時結束。" },
-		{ role: "北斗星君", text: "唉呦威壓！你不在我的名單裡，你怎麼在這？！" },
-        { role: "我", text: "我....我是被阿罵帶來的..." },
-        { role: "北斗星君", text: "（扶額）牛頭馬面，你們牛馬組不是缺人嗎？這傢伙看起來挺社畜的。" },
-        { role: "我", text: "等一等!!!"},
-		{ role: "我", text: "稟大人，小人本住在蘇州的城邊， 家中有屋又有田，生活樂無邊。"},
-		{ role: "我", text: "誰知那唐伯虎，他蠻橫不留情，勾結官俯目無天，占我大屋奪我田，我爺爺跟他來翻臉，慘被他一棍來打扁，...  "},
-		{ role: "我", text: "最終流落到江邊。為求養老爹，只有獨賣火柴在廟前。... 誰知那唐伯虎，他實在太陰險 知道此情形，竟派人來暗算"},
-		{ role: "我", text: "把我父子狂毆在市前，小人身壯健，殘命得留存。為求葬老爹，唯有賣身為奴自作賤， 一面勤賺錢，一面讀書篇， 發誓把功名顯，手刃仇人意志堅! 從此唐寅詩集伴身邊，我銘記此仇不共戴天!!!" },
-        //{ role: "ACTION", action: "video" }, 
-        //{ role: "我", text: "...小人為求葬老爹，唯有賣身為奴自作賤！從此唐寅詩集伴身邊，我銘記此仇不共戴天！！！" },
-        { role: "北斗星君", text: "然後？" },
-        { role: "我", text: "然後....就被阿罵帶上來了。" },
-        { role: "北斗星君", text: "（這人怪怪的...）" },
-        { role: "南斗星君", text: "這不也挺有趣的嗎？咦?註生娘娘跟財神爺剛好也來啦!不如就給他個重生的好機會吧。" },
-		{ role: "註生娘娘", text: "那麼...反正有財神爺在，安排個普通但有愛的家，至於性別就決定為..." },
-        { role: "財神爺", text: "且慢!不如這小傢伙猜猜看，註生娘娘為他安排的是男孩還是女孩" },
-        { role: "旁白", text: "財神爺準備了7道謎題，是男還是女孩全藏在謎底裡面 \n\n事不宜遲，解題開始!!" },
-        { role: "ACTION", action: "quiz" }
-    ];
-
-    // 3. 測驗題目
-    const questions = [
-        { q: "哆啦A夢是什麼顏色？", a: ["紅色", "藍色"], correct: 0 },
-        { q: "誰最愛亂買東西？", a: ["獅子", "老虎", "斑馬"], correct: 2 },
-        { q: "很可愛的螞蟻叫什麼？", a: ["可愛蟻", "史狗蟻", "卡哇蟻"], correct: 2 },
-        { q: "誰沒生孩子就先當上了娘？", a: ["偽娘", "新娘", "喵娘"], correct: 1 },
-        { q: "張雨生家裡的木頭都哪裡來的？", a: ["買來的", "鋸來的", "種來的"], correct: 1 },
-        { q: "這是腳的英文怎麼說？", a: ["foot", "Oliver", "Jessica"], correct: 2 },
-        { q: "屁股的英文怎麼說？", a: ["bottom", "KK ass", "Jessica Chen"], correct: 2 }
-    ];
-
-    // 4. 遊戲控制變數
-    let currentStep = 0;
-    let currentQuiz = 0;
-    let score = 0;
-    let isHeavenMode = false;
-
-    window.onload = () => { renderIDInput(); };
-
-    // 執行分支劇情
-    function showScene(key, skipClear = false) {
-		if (key === "HEAVEN_EVENT") { enterHeaven(); return; }
-
-		const scene = scenes[key];
-		document.getElementById('character-name').innerText = scene.name;
-		document.getElementById('dialogue-text').innerText = scene.text;
-
-		const choicesArea = document.getElementById('choices-area');
-		if (!skipClear) choicesArea.innerHTML = ''; // 只在遊戲正式場景才清空
-
-		if(scene.choices){
-			scene.choices.forEach(c => {
+		function showQuestion() {
+			if (currentQuiz >= questions.length) {
+				showFinalResult();
+				return;
+			}
+			const q = questions[currentQuiz];
+			document.getElementById('character-name').innerText = "財神爺的考驗";
+			document.getElementById('dialogue-text').innerText = `第 ${currentQuiz + 1} 題：${q.q}`;
+			
+			const area = document.getElementById('choices-area');
+			area.innerHTML = '';
+			q.a.forEach((opt, idx) => {
 				const btn = document.createElement('button');
 				btn.className = 'choice-btn';
-				btn.innerText = c.text;
-				btn.onclick = () => showScene(c.next);
-				choicesArea.appendChild(btn);
+				btn.innerText = opt;
+				btn.onclick = () => {
+					if (idx === q.correct) score++;
+					//執行送出答案紀錄
+					submitQuestionResult(
+					  currentQuiz + 1,
+					  opt,
+					  q.a[q.correct]
+					);
+					currentQuiz++;
+					showQuestion();
+				};
+				
+
+				area.appendChild(btn);
 			});
 		}
-	}
 
 
-    // 切換到天庭模式
-    function enterHeaven() {
-        isHeavenMode = true;
-        document.body.className = "mode-heaven";
-        document.getElementById('choices-area').innerHTML = '';
-        document.getElementById('dialogue-box').onclick = nextStep;
-        nextStep();
-    }
-
-    // 線性對話控制
-    function nextStep() {
-    if (!isHeavenMode || currentStep >= scripts.length) return;
-
-    const data = scripts[currentStep];
-
-    // ACTION 特殊處理
-    if (data.role === "ACTION") {
-        currentStep++;
-        if (data.action === "video") {
-            document.getElementById('video-overlay').style.display = 'flex';
-        } else if (data.action === "quiz") {
-            startQuiz();
-        }
-        return;
-    }
-
-    // ⭐ 黑幕轉場判斷
-    if (data.black) {
-        document.body.className = "mode-black";
-    } else {
-        document.body.className = "mode-heaven";
-    }
-
-    // 顯示內容
-    document.getElementById('character-name').innerText = data.role;
-    document.getElementById('character-name').style.color = roles[data.role]?.color || "#fff";
-    document.getElementById('dialogue-text').innerText = data.text;
-    document.getElementById('portrait').innerText = roles[data.role]?.img || "";
-
-    currentStep++;
-	}
-
-
-    function closeVideo() {
-        document.getElementById('video-overlay').style.display = 'none';
-        currentStep++;
-        nextStep();
-    }
-
-	
-
-
-
-    // 測驗邏輯
-    function startQuiz() {
-        document.getElementById('dialogue-box').onclick = null; // 測驗時暫停點擊對話
-        showQuestion();
-    }
-
-    function showQuestion() {
-        if (currentQuiz >= questions.length) {
-            showFinalResult();
-            return;
-        }
-        const q = questions[currentQuiz];
-        document.getElementById('character-name').innerText = "財神爺的考驗";
-        document.getElementById('dialogue-text').innerText = `第 ${currentQuiz + 1} 題：${q.q}`;
-        
-        const area = document.getElementById('choices-area');
-        area.innerHTML = '';
-        q.a.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.innerText = opt;
-            btn.onclick = () => {
-                if (idx === q.correct) score++;
-				//執行送出答案紀錄
-				submitQuestionResult(
-				  currentQuiz + 1,
-				  opt,
-				  q.a[q.correct]
-				);
-                currentQuiz++;
-                showQuestion();
-            };
+		function showFinalResult() {
+			const area = document.getElementById('choices-area');
+			area.innerHTML = ''; 
 			
+			document.getElementById('portrait').innerText = "💰";
+			document.getElementById('character-name').innerText = "財神爺";
+			
+			// 這裡先不給加持，只顯示答對題數，引導玩家做最後選擇
+			document.getElementById('dialogue-text').innerText = `考驗結束！你一共答對了 ${score} 題。\n\n現在，到了最重要的時刻... \n請投下你神聖的一票，你覺得恩恩寶寶是？`;
+			
+			// 建立男寶按鈕
+			const boyBtn = document.createElement('button');
+			boyBtn.className = 'choice-btn';
+			boyBtn.innerText = "♂ 帥氣男寶";
+			boyBtn.style.background = "#54a0ff";
+			boyBtn.style.color = "white";
+			boyBtn.onclick = () => saveAndFinish("男寶");
+			
+			// 建立女寶按鈕
+			const girlBtn = document.createElement('button');
+			girlBtn.className = 'choice-btn';
+			girlBtn.innerText = "♀ 可愛女寶";
+			girlBtn.style.background = "#ff9ff3";
+			girlBtn.style.color = "white";
+			girlBtn.onclick = () => saveAndFinish("女寶");
+			
+			area.appendChild(boyBtn);
+			area.appendChild(girlBtn);
+		}
 
-            area.appendChild(btn);
-        });
-    }
+		function saveAndFinish(genderPick) {
+			// ⭐⭐⭐ 送出「最終性別選擇」到 Google Form ⭐⭐⭐
+			submitQuestionResult(
+				"最終性別投票", // 題目欄
+				genderPick,      // 玩家選擇：男寶 / 女寶
+				"女寶"           // 正確答案（你已設定恩恩是女寶）
+			);
+			const area = document.getElementById('choices-area');
+			area.innerHTML = ''; // 點完後清空按鈕，避免重複點擊
+			
+			let finalMessage = "";
+			let finalTitle = "";
+			
+			if (genderPick === "女寶") {
+				// 猜對了 (正確答案：女寶)
+				finalTitle = "財神爺：大喜！";
+				document.getElementById('portrait').innerText = "👸"; // 換成註生娘娘或開心的表情
+				finalMessage = `恭喜你猜對了！恩恩寶寶是個【可愛女寶寶】！\n\n財神爺給你加持：\n【祝你日進斗金，加官晉爵！】\n以及眾神給你祝福：\n【在未來的日子裡一帆風順、身體健康、平安喜樂。】`;
+			} else {
+				// 猜錯了 (選了男寶)
+				finalTitle = "眾神明的祝福";
+				document.getElementById('portrait').innerText = "✨"; 
+				finalMessage = `雖然猜錯了（其實恩恩寶寶是個女孩子唷！），但神明們感受到你的參與。\n\n特此祝福你：\n【在未來的日子裡一帆風順、身體健康、平安喜樂。】`;
+			}
+			
+			document.getElementById('character-name').innerText = finalTitle;
+			document.getElementById('dialogue-text').innerText = finalMessage;
+	}
+			
+	</script>
 
-
-	function showFinalResult() {
-        const area = document.getElementById('choices-area');
-        area.innerHTML = ''; 
-        
-        document.getElementById('portrait').innerText = "💰";
-        document.getElementById('character-name').innerText = "財神爺";
-        
-        // 這裡先不給加持，只顯示答對題數，引導玩家做最後選擇
-        document.getElementById('dialogue-text').innerText = `考驗結束！你一共答對了 ${score} 題。\n\n現在，到了最重要的時刻... \n請投下你神聖的一票，你覺得恩恩寶寶是？`;
-        
-        // 建立男寶按鈕
-        const boyBtn = document.createElement('button');
-        boyBtn.className = 'choice-btn';
-        boyBtn.innerText = "♂ 帥氣男寶";
-        boyBtn.style.background = "#54a0ff";
-        boyBtn.style.color = "white";
-        boyBtn.onclick = () => saveAndFinish("男寶");
-        
-        // 建立女寶按鈕
-        const girlBtn = document.createElement('button');
-        girlBtn.className = 'choice-btn';
-        girlBtn.innerText = "♀ 可愛女寶";
-        girlBtn.style.background = "#ff9ff3";
-        girlBtn.style.color = "white";
-        girlBtn.onclick = () => saveAndFinish("女寶");
-        
-        area.appendChild(boyBtn);
-        area.appendChild(girlBtn);
-    }
-
-    function saveAndFinish(genderPick) {
-        const area = document.getElementById('choices-area');
-        area.innerHTML = ''; // 點完後清空按鈕，避免重複點擊
-        
-        let finalMessage = "";
-        let finalTitle = "";
-        
-        if (genderPick === "女寶") {
-            // 猜對了 (正確答案：女寶)
-            finalTitle = "財神爺：大喜！";
-            document.getElementById('portrait').innerText = "👸"; // 換成註生娘娘或開心的表情
-            finalMessage = `恭喜你猜對了！恩恩寶寶是個【可愛女寶寶】！\n\n財神爺給你加持：\n【祝你日進斗金，加官晉爵！】\n以及眾神給你祝福：\n【在未來的日子裡一帆風順、身體健康、平安喜樂。】`;
-        } else {
-            // 猜錯了 (選了男寶)
-            finalTitle = "眾神明的祝福";
-            document.getElementById('portrait').innerText = "✨"; 
-            finalMessage = `雖然猜錯了（其實恩恩寶寶是個女孩子唷！），但神明們感受到你的參與。\n\n特此祝福你：\n【在未來的日子裡一帆風順、身體健康、平安喜樂。】`;
-        }
-        
-        document.getElementById('character-name').innerText = finalTitle;
-        document.getElementById('dialogue-text').innerText = finalMessage;
-}
-        
-</script>
-
-</body>
-</html>
+	</body>
+	</html>
