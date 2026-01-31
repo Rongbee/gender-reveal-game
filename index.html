@@ -168,8 +168,8 @@
 		};
 
 		const bgm = document.getElementById("bgm");
-		let currentBGMkey = null;
-		let userInteracted = false;
+		let currentBGM = null;
+
 
 		
 		// ==================== Google Form 單題送出 ====================
@@ -216,7 +216,6 @@
 			  alert("請輸入玩家 ID！");
 			  return;
 			}
-			userInteracted = true;   // ⭐⭐⭐ 關鍵，監控玩家在線上
 			playerName = input.value.trim();
 			
 			// ⭐ 使用者點擊 → 播放音樂（合法）
@@ -229,14 +228,9 @@
 		}
 		
 		function playBGM(key, volume = 0.4) {
-		let videoReturnBGM = currentBGMKey;
-		  if (!userInteracted) return;  //玩家離開時停止
+		  if (currentBGM === key) return; // 同一首就不重播
 
-			  stopBGM();
-					
-		  if (currentBGMkey === key) return; // 同一首就不重播
-
-		  currentBGMkey = key;
+		  currentBGM = key;
 		  bgm.src = BGM_LIST[key];
 		  bgm.volume = volume;
 		  bgm.play();
@@ -246,14 +240,8 @@
 		  bgm.pause();
 		}
 
-		function resumeBGM() {  //玩家回來時重播
-		  if (!userInteracted) return;
-		  if (bgm.paused && currentBGMKey) {
-			bgm.play().catch(() => {});
-		  }
-		}
 		
-		function playSound(src) {  //音效備用插槽，現在沒有功能
+		function playSound(src) {
 		  const sfx = new Audio(src);
 		  sfx.volume = 0.8;
 		  sfx.play();
@@ -489,8 +477,7 @@
 		  nextStep();
 
 		  // 音樂接回來
-		  if (vudeiReturnBGM) {
-		  playBGM(videoReturnBGM, 0.4);
+		  bgm.play();
 		}
 
 		
@@ -621,16 +608,6 @@
 		  // 5️⃣（可選）鎖住點擊
 		  document.getElementById("dialogue-box").onclick = null;
 		}
-		
-		document.addEventListener("visibilitychange", () => {
-		  if (document.hidden) {
-			stopBGM();
-		  } else {
-			resumeBGM();
-		  }
-		});
-
-		window.addEventListener("pagehide", stopBGM);
 	
 	</script>
 
