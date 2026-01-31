@@ -168,7 +168,7 @@
 		};
 
 		const bgm = document.getElementById("bgm");
-		let currentBGM = null;
+		let currentBGMkey = null;
 		let userInteracted = false;
 
 		
@@ -229,13 +229,14 @@
 		}
 		
 		function playBGM(key, volume = 0.4) {
+		let videoReturnBGM = currentBGMKey;
 		  if (!userInteracted) return;  //玩家離開時停止
 
 			  stopBGM();
 					
-		  if (currentBGM === key) return; // 同一首就不重播
+		  if (currentBGMkey === key) return; // 同一首就不重播
 
-		  currentBGM = key;
+		  currentBGMkey = key;
 		  bgm.src = BGM_LIST[key];
 		  bgm.volume = volume;
 		  bgm.play();
@@ -247,8 +248,8 @@
 
 		function resumeBGM() {  //玩家回來時重播
 		  if (!userInteracted) return;
-		  if (currentBGM && currentBGM.paused) {
-			currentBGM.play().catch(() => {});
+		  if (bgm.paused && currentBGMKey) {
+			bgm.play().catch(() => {});
 		  }
 		}
 		
@@ -488,7 +489,8 @@
 		  nextStep();
 
 		  // 音樂接回來
-		  bgm.play();
+		  if (vudeiReturnBGM) {
+		  playBGM(videoReturnBGM, 0.4);
 		}
 
 		
