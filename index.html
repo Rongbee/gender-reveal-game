@@ -543,20 +543,20 @@
 			
 			if (genderPick === "女寶") {
 				// 猜對了 (正確答案：女寶)
-				finalTitle = "財神爺：大喜！";
-				document.getElementById('portrait').innerText = "👸"; // 換成註生娘娘或開心的表情
-				finalMessage = `恭喜你猜對了！恩恩寶寶是個【可愛女寶寶】！\n\n財神爺給你加持：\n【祝你日進斗金，加官晉爵！】\n以及眾神給你祝福：\n【在未來的日子裡一帆風順、身體健康、平安喜樂。】`;
+				finalTitle = "財神爺：呵呵呵，好好好";
+				document.getElementById('portrait').innerText = "💰"; // 可換成其他icon或開心的表情
+				finalMessage = `正確答案稍後揭曉\n\n在這邊財神爺以及眾神先祝大家：\n【新年快樂、恭喜發財、身體健康、平安順利。】`;
 			} else {
 				// 猜錯了 (選了男寶)
-				finalTitle = "眾神明的祝福";
+				finalTitle = "財神爺：呵呵呵，好好好";
 				document.getElementById('portrait').innerText = "✨"; 
-				finalMessage = `雖然猜錯了（其實恩恩寶寶是個女孩子唷！），但神明們感受到你的參與。\n\n特此祝福你：\n【在未來的日子裡一帆風順、身體健康、平安喜樂。】`;
+				finalMessage = `正確答案稍後揭曉\n\n在這邊財神爺以及眾神先祝大家：\n【新年快樂、恭喜發財、身體健康、平安順利。】`;
 			}
 			
 			document.getElementById('character-name').innerText = finalTitle;
 			document.getElementById('dialogue-text').innerText = finalMessage;
 			
-			// ⭐ 5 秒後自動結束
+			// ⭐ 10 秒後自動結束
 			  const endTimer = setTimeout(endGame, 10000);
 
 			  // ⭐ 點擊任意處立刻結束
